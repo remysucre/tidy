@@ -151,7 +151,13 @@ Example HTML output:
    - Changed UTF-8 smart quotes from literal characters to escape sequences
    - Playdate's Lua compiler requires escaped UTF-8 bytes instead of literal UTF-8 in source
 
-3. **Lua Version Compatibility**:
+3. **require() Compatibility Shim**:
+   - Playdate uses `import` instead of standard Lua's `require`
+   - Implemented custom `require()` function using `playdate.file.run()`
+   - Set up `package.loaded` cache to prevent reloading modules
+   - Allows lunamark to use standard `require("lpeg")` syntax without modification
+
+4. **Lua Version Compatibility**:
    - Playdate uses Lua 5.4
    - Lunamark is compatible with Lua 5.1+
    - LuLPeg emulates LPeg v0.12 behavior

@@ -3,6 +3,36 @@ import "CoreLibs/graphics"
 
 local gfx = playdate.graphics
 
+-- Playdate uses 'import' instead of 'require', but lunamark expects 'require'
+-- Set up the package system for standard Lua module loading
+if not package then
+    _G.package = {
+        loaded = {},
+        path = "",
+        cpath = ""
+    }
+end
+
+-- Create a custom require function
+_G.require = function(modname)
+    -- Check if already loaded
+    if package.loaded[modname] then
+        return package.loaded[modname]
+    end
+
+    -- Try to load the file
+    local filepath = modname:gsub("%.", "/") .. ".lua"
+    local chunk, err = playdate.file.run(filepath)
+
+    if not chunk then
+        error("module '" .. modname .. "' not found: " .. tostring(err))
+    end
+
+    -- Cache and return the module
+    package.loaded[modname] = chunk or true
+    return chunk
+end
+
 -- Test markdown content
 local test_markdown = [[
 # Hello Playdate!
