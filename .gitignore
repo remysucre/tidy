@@ -1,0 +1,7 @@
+# External library repositories (dependencies)
+LuLPeg/
+lunamark/
+tidy-html5/
+
+# Playdate SDK (if cloned locally)
+PlaydateSDK/
