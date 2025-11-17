@@ -20,6 +20,23 @@ _G.require = function(modname)
         return package.loaded[modname]
     end
 
+    -- Handle built-in Lua libraries
+    local builtins = {
+        coroutine = coroutine,
+        string = string,
+        table = table,
+        math = math,
+        io = io,
+        os = os,
+        debug = debug,
+        utf8 = utf8,
+    }
+
+    if builtins[modname] then
+        package.loaded[modname] = builtins[modname]
+        return builtins[modname]
+    end
+
     -- Try to load the file - playdate.file.run looks for .pdz (compiled bytecode)
     local filepath = modname:gsub("%.", "/")
     local chunk, err = playdate.file.run(filepath)
