@@ -1,0 +1,7 @@
+# Build artifacts
+build/
+Source/
+
+# Generated PDX files (keep pdex.bin for reference)
+TidyTest.pdx/pdex.so
+TidyTest.pdx/pdxinfo
