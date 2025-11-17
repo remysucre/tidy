@@ -1,23 +1,35 @@
-# HTML Tidy + Playdate Integration Test
+# HTML Tidy & Lunamark + Playdate Integration Tests
 
-This repository demonstrates successful integration of the HTML Tidy library with the Playdate SDK.
+This repository demonstrates successful integration of parsing libraries with the Playdate SDK for building a browser:
+1. **HTML Tidy** (C library) - HTML parsing and cleaning
+2. **Lunamark** (Lua library) - Markdown parsing
 
 ## Project Structure
 
 ```
 .
-├── playdate_tidy_test/     # Minimal Playdate app using HTML Tidy
+├── playdate_tidy_test/       # C-based HTML Tidy integration
 │   ├── src/
-│   │   └── main.c          # Main application code
-│   ├── Makefile            # Build configuration
-│   ├── Source/             # Build output directory
-│   └── TidyTest.pdx/       # Compiled Playdate executable
-└── tidy-html5/             # HTML Tidy library source code
+│   │   ├── main.c            # Main application code
+│   │   └── syscalls.c        # Syscall stubs for device
+│   ├── Makefile              # Build configuration
+│   └── TidyTest.pdx/         # Compiled executable (233 KB device, 1.8 MB sim)
+│
+├── playdate_lunamark_test/   # Lua-based Markdown parser integration
+│   ├── Source/
+│   │   ├── main.lua          # Main Lua application
+│   │   ├── lpeg.lua          # LuLPeg (pure Lua PEG parser)
+│   │   └── lunamark/         # Lunamark library
+│   └── Lunamark.pdx/         # Compiled executable (~50 KB)
+│
+└── tidy-html5/               # HTML Tidy library source code
 ```
 
 ## What This Demonstrates
 
-The test application successfully:
+### HTML Tidy Test (C-based)
+
+The HTML Tidy test application successfully:
 1. Integrates the complete HTML Tidy library (tidy-html5) with Playdate C SDK
 2. Compiles all tidy source files into the Playdate executable
 3. Exercises core tidy functionality including:
@@ -28,11 +40,31 @@ The test application successfully:
    - Running diagnostics (`tidyRunDiagnostics()`)
    - Saving output to buffer (`tidySaveBuffer()`)
 
+### Lunamark Test (Pure Lua)
+
+The Lunamark test application successfully:
+1. Integrates the complete Lunamark Markdown parser (pure Lua)
+2. Uses LuLPeg as a drop-in replacement for lpeg (no C code needed)
+3. Parses complex Markdown including:
+   - Headers (H1, H2, H3)
+   - Bold and italic text
+   - Ordered and unordered lists
+   - Links and URLs
+   - Code blocks (fenced and indented)
+   - Blockquotes
+4. Converts Markdown to HTML
+5. Runs entirely in Lua - no C compilation required!
+
 ## Build Requirements
 
+### For HTML Tidy (C-based)
 - Playdate SDK 3.0.1 or later
 - GCC compiler (for simulator builds)
 - ARM GCC toolchain `gcc-arm-none-eabi` (for device builds)
+
+### For Lunamark (Lua-based)
+- Playdate SDK 3.0.1 or later
+- No C compiler required!
 
 ## Building
 
@@ -141,6 +173,41 @@ Key verified symbols:
 - `tidySaveBuffer` ✓
 - Plus 100+ additional tidy functions
 
+## Comparison: C vs Lua Approach
+
+| Feature | HTML Tidy (C) | Lunamark (Lua) |
+|---------|---------------|----------------|
+| **Language** | C | Pure Lua |
+| **Size (Device)** | 233 KB | ~50 KB |
+| **Size (Simulator)** | 1.8 MB | ~50 KB |
+| **Build Complexity** | Requires ARM toolchain, Makefile, syscalls | Just `pdc` command |
+| **Performance** | Native C speed | Lua (slower but sufficient) |
+| **Modifiability** | Requires C recompilation | Edit Lua files directly |
+| **Cross-platform** | Different builds for sim/device | Same code everywhere |
+| **Dependencies** | None (self-contained) | LuLPeg (pure Lua) |
+| **Use Case** | HTML parsing/cleaning | Markdown parsing |
+| **Integration Effort** | High (C integration, syscalls, linking) | Low (copy files, fix UTF-8) |
+
+### Recommendations
+
+**Use C approach when:**
+- Need maximum performance
+- Working with existing C libraries
+- Require complex low-level operations
+- Can handle C compilation toolchain
+
+**Use Lua approach when:**
+- Library available in pure Lua
+- Rapid development/iteration needed
+- Want simpler builds
+- Performance is acceptable
+
+**Hybrid approach (Best for browser):**
+- Use C for HTML Tidy (performance-critical HTML parsing)
+- Use Lua for Lunamark (Markdown parsing)
+- Use Lua for UI, navigation, and app logic
+- Expose C functions to Lua where needed
+
 ## Usage for Lua Browser
 
 This test confirms that the HTML Tidy library can be successfully compiled and linked with Playdate applications. For a Lua browser on Playdate, you could:
@@ -151,17 +218,42 @@ This test confirms that the HTML Tidy library can be successfully compiled and l
 
 The compiled binary size (1.8 MB) should be acceptable for Playdate, which supports applications up to several megabytes.
 
-## Next Steps
+## Next Steps for a Playdate Browser
 
-To use this in a real browser:
-1. Add HTML rendering logic
-2. Implement HTTP networking (Playdate supports HTTP via C API)
-3. Create UI controls for navigation
-4. Add URL handling and history
-5. Implement basic CSS parsing/styling (or use a simple subset)
+Combining both approaches, a full browser could include:
+
+### Core Parsing
+1. **HTML**: Use HTML Tidy (C) for robust HTML parsing and error correction
+2. **Markdown**: Use Lunamark (Lua) for rendering Markdown pages
+
+### Networking
+3. Implement HTTP/HTTPS requests using Playdate C API
+4. Handle redirects, headers, cookies
+
+### Rendering
+5. Create a simple layout engine in Lua
+6. Implement basic CSS support (subset: fonts, colors, margins)
+7. Render to Playdate's 400x240 1-bit display
+
+### UI/Navigation
+8. URL bar and controls (Playdate crank for scrolling?)
+9. History and bookmarks
+10. Tab support (if memory allows)
+
+### Optimizations
+11. Caching (memory and disk)
+12. Progressive rendering
+13. Image dithering for 1-bit display
 
 ## License
 
 - Playdate SDK: See SDK_LICENSE in Playdate SDK
 - HTML Tidy: MIT-style license (see tidy-html5 repository)
+- Lunamark: MIT License (see lunamark repository)
+- LuLPeg: MIT License (see LuLPeg repository)
 - This integration code: Public domain
+
+## See Also
+
+- [playdate_tidy_test/README.md](playdate_tidy_test/README.md) - Detailed HTML Tidy integration docs
+- [playdate_lunamark_test/README.md](playdate_lunamark_test/README.md) - Detailed Lunamark integration docs
