@@ -22,6 +22,7 @@ VPATH += ../tidy-html5/src
 
 # List C source files here - including minimal set of tidy sources
 SRC = src/main.c \
+      src/syscalls.c \
       ../tidy-html5/src/access.c \
       ../tidy-html5/src/alloc.c \
       ../tidy-html5/src/attrdict.c \
@@ -36,7 +37,6 @@ SRC = src/main.c \
       ../tidy-html5/src/istack.c \
       ../tidy-html5/src/language.c \
       ../tidy-html5/src/lexer.c \
-      ../tidy-html5/src/mappedio.c \
       ../tidy-html5/src/message.c \
       ../tidy-html5/src/messageobj.c \
       ../tidy-html5/src/parser.c \
@@ -56,7 +56,7 @@ UINCDIR = ../tidy-html5/include ../tidy-html5/src
 UASRC =
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DSUPPORT_UTF16_ENCODINGS=1 -DSUPPORT_ASIAN_ENCODINGS=1 -DSUPPORT_ACCESSIBILITY_CHECKS=1
+UDEFS = -DSUPPORT_UTF16_ENCODINGS=1 -DSUPPORT_ASIAN_ENCODINGS=1 -DSUPPORT_ACCESSIBILITY_CHECKS=1 -DSUPPORT_POSIX_MAPPED_FILES=0
 
 # Define ASM defines here
 UADEFS =
@@ -68,3 +68,7 @@ ULIBDIR =
 ULIBS =
 
 include $(SDK)/C_API/buildsupport/common.mk
+
+# Override simulator build to include UDEFS
+$(OBJDIR)/pdex.${DYLIB_EXT}: $(SRC) | MKOBJDIR
+	$(SIMCOMPILER) $(DYLIB_FLAGS) -lm -DTARGET_SIMULATOR=1 -DTARGET_EXTENSION=1 $(UDEFS) $(INCDIR) -o $(OBJDIR)/pdex.${DYLIB_EXT} $(SRC)

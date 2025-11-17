@@ -32,7 +32,7 @@ The test application successfully:
 
 - Playdate SDK 3.0.1 or later
 - GCC compiler (for simulator builds)
-- ARM GCC toolchain (for device builds, optional)
+- ARM GCC toolchain `gcc-arm-none-eabi` (for device builds)
 
 ## Building
 
@@ -49,6 +49,15 @@ The test application successfully:
    export PLAYDATE_SDK_PATH=/path/to/PlaydateSDK
    ```
 
+3. Install ARM toolchain (for device builds):
+   ```bash
+   # Ubuntu/Debian
+   apt-get install gcc-arm-none-eabi
+
+   # macOS (installed by SDK)
+   # Included with Playdate SDK installer
+   ```
+
 ### Compile for Simulator
 
 ```bash
@@ -57,8 +66,29 @@ make simulator
 ```
 
 This produces:
-- `build/pdex.so` - Shared library for the Playdate simulator
-- `TidyTest.pdx/` - Complete Playdate executable bundle
+- `build/pdex.so` - Shared library for the Playdate simulator (1.8 MB)
+- `TidyTest.pdx/pdex.so` - Simulator library in PDX bundle
+
+### Compile for Device (Playdate Hardware)
+
+```bash
+cd playdate_tidy_test
+make device
+```
+
+This produces:
+- `build/pdex.elf` - ELF executable with debug symbols (3.6 MB)
+- `TidyTest.pdx/pdex.bin` - Device firmware binary (233 KB)
+- `Source/pdex.elf` - Copy of ELF for distribution
+
+### Compile Both (Simulator + Device)
+
+```bash
+cd playdate_tidy_test
+make all
+```
+
+This builds both simulator and device versions in one command.
 
 ### Clean Build
 
@@ -71,12 +101,14 @@ make clean
 ### Integration Approach
 
 The HTML Tidy library is integrated by:
-1. Including all necessary `.c` source files from `tidy-html5/src/` in the Makefile
+1. Including all necessary `.c` source files from `tidy-html5/src/` in the Makefile (excluding `mappedio.c` which requires POSIX)
 2. Adding include paths for both `tidy-html5/include/` and `tidy-html5/src/`
 3. Defining required preprocessor macros:
    - `SUPPORT_UTF16_ENCODINGS=1`
    - `SUPPORT_ASIAN_ENCODINGS=1`
    - `SUPPORT_ACCESSIBILITY_CHECKS=1`
+   - `SUPPORT_POSIX_MAPPED_FILES=0` (disabled for Playdate)
+4. Providing minimal syscall stubs in `src/syscalls.c` for device builds (newlib requirements)
 
 ### Test Application
 
@@ -92,8 +124,14 @@ The test app (`src/main.c`):
 
 ### Compilation Results
 
-- **Compiled Library Size**: 1.8 MB
-- **Build Status**: ✅ Success (no errors, zero warnings)
+**Simulator Build:**
+- **Compiled Library Size**: 1.8 MB (pdex.so)
+- **Build Status**: ✅ Success (warnings only, no errors)
+
+**Device Build:**
+- **Device Binary Size**: 233 KB (pdex.bin) - fits easily on Playdate!
+- **Debug Symbols**: 3.6 MB (pdex.elf) - for development/debugging only
+- **Build Status**: ✅ Success (warnings only, no errors)
 - **Symbol Verification**: All tidy API functions present in compiled binary
 
 Key verified symbols:
