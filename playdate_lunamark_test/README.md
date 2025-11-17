@@ -10,13 +10,41 @@ This repository demonstrates successful integration of the Lunamark Markdown par
 │   ├── main.lua           # Main Playdate app that tests lunamark
 │   ├── pdxinfo            # Playdate app metadata
 │   ├── lpeg.lua           # LuLPeg - pure Lua PEG parser (renamed from lulpeg.lua)
+│   ├── lunamark.lua       # Main lunamark module entry point
+│   ├── cosmo.lua          # Cosmo templating library
+│   ├── alt-getopt.lua     # Command-line option parser
+│   ├── cosmo/             # Cosmo submodules
+│   │   ├── fill.lua
+│   │   └── grammar.lua
 │   └── lunamark/          # Lunamark library files
 │       ├── entities.lua
 │       ├── util.lua
 │       ├── reader/        # Markdown reader
 │       └── writer/        # HTML/LaTeX/etc writers
-└── Lunamark.pdx/          # Compiled Playdate executable
+└── Lunamark.pdx/          # Compiled Playdate executable (~144KB)
 ```
+
+## Dependencies
+
+Lunamark requires several Lua libraries to function:
+
+1. **lpeg** (≥ 0.10) - PEG parsing library
+   - Using: **LuLPeg** - pure Lua port, no C compilation needed
+   - Source: https://github.com/pygy/LuLPeg
+
+2. **cosmo** (≥ 10.0) - Templating library for output formatting
+   - Pure Lua library
+   - Source: https://github.com/mascarenhas/cosmo
+
+3. **alt-getopt** (≥ 0.7) - Command-line option parsing
+   - Pure Lua library (included but may not be actively used in library mode)
+   - Source: https://github.com/cheusov/lua-alt-getopt
+
+4. **luautf8** (≥ 0.1.1) - UTF-8 support
+   - NOT needed! Playdate uses Lua 5.4 which has built-in `utf8` library
+   - Lunamark automatically detects and uses Lua 5.4's native utf8 support
+
+All dependencies are pure Lua implementations, avoiding the need for C compilation.
 
 ## What This Demonstrates
 
