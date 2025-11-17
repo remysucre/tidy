@@ -13,6 +13,18 @@ if not package then
     }
 end
 
+-- Provide loadstring for compatibility with libraries expecting Lua 5.1 behavior
+-- LuLPeg uses (loadstring or load) to test for goto support
+-- Playdate's load() has non-standard behavior, so provide a stub that safely fails
+-- This disables goto detection in LuLPeg, which is not needed for basic parsing
+if not loadstring then
+    _G.loadstring = function(str, chunkname)
+        -- Return nil to indicate compilation not supported
+        -- This makes LuLPeg's goto detection fail safely
+        return nil, "load not supported in Playdate"
+    end
+end
+
 -- Create a custom require function
 _G.require = function(modname)
     -- Check if already loaded
