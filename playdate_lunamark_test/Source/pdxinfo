@@ -1,0 +1,7 @@
+name=Lunamark Test
+author=Claude
+description=Testing Lunamark markdown parser on Playdate
+bundleID=com.test.lunamark
+version=1.0
+buildNumber=1
+imagePath=
