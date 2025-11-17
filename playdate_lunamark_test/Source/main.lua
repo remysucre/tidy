@@ -20,8 +20,8 @@ _G.require = function(modname)
         return package.loaded[modname]
     end
 
-    -- Try to load the file
-    local filepath = modname:gsub("%.", "/") .. ".lua"
+    -- Try to load the file - playdate.file.run looks for .pdz (compiled bytecode)
+    local filepath = modname:gsub("%.", "/")
     local chunk, err = playdate.file.run(filepath)
 
     if not chunk then
