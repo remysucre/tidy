@@ -5,3 +5,11 @@ tidy-html5/
 
 # Playdate SDK (if cloned locally)
 PlaydateSDK/
+
+# Playdate build artifacts
+*.pdx/
+build/
+*.so
+*.dylib
+*.dll
+*.elf
