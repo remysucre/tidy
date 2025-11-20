@@ -1,0 +1,8 @@
+name=Lexbor Test
+author=Test
+description=Testing lexbor HTML parser library on Playdate
+bundleID=com.test.lexbortest
+version=1.0.0
+buildNumber=1
+pdxversion=30000
+buildtime=816806265

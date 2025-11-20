@@ -1,0 +1,6 @@
+name=cmark Test
+author=Test
+description=Testing cmark CommonMark library integration with Playdate
+bundleID=com.test.cmarktest
+version=1.0.0
+buildNumber=1
