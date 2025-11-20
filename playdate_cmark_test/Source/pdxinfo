@@ -1,7 +1,0 @@
-name=cmark Test
-author=Claude
-description=Testing cmark CommonMark parser on Playdate
-bundleID=com.test.cmark
-version=1.0
-buildNumber=1
-imagePath=
